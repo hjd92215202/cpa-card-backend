@@ -12,6 +12,7 @@ pub struct Card {
     pub difficulty: i16,
     pub importance: String,
     pub interval_days: i32,
+    pub card_type: Option<String>, // 新增字段：用于支持 问答/笔记/代码 模式
     pub next_review_date: Option<NaiveDate>,
     pub created_at: Option<DateTime<Utc>>,
 }
@@ -24,9 +25,10 @@ pub struct CreateCardDto {
     pub insights: Option<String>,
     pub difficulty: i16,
     pub importance: String,
+    pub card_type: Option<String>, // 新增字段
 }
 
 #[derive(Debug, Deserialize)]
 pub struct ReviewCardDto {
-    pub interval_days: i32, // 用户标记的下一次复习间隔
+    pub interval_days: i32,
 }

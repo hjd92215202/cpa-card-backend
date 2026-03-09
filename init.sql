@@ -96,3 +96,10 @@ $$ language 'plpgsql';
 
 CREATE TRIGGER update_cards_modtime BEFORE UPDATE ON cards FOR EACH ROW EXECUTE PROCEDURE update_modified_column();
 CREATE TRIGGER update_subjects_modtime BEFORE UPDATE ON subjects FOR EACH ROW EXECUTE PROCEDURE update_modified_column();
+
+-- 修改 subjects 表为 libraries (或者保留名称但增加字段)
+ALTER TABLE subjects ADD COLUMN icon_type VARCHAR(50) DEFAULT 'Book'; -- 支持不同的图标类型
+ALTER TABLE subjects ADD COLUMN visibility VARCHAR(20) DEFAULT 'private'; -- 预留：私有/公开
+
+-- 优化卡片表，支持多种卡片类型 (不仅仅是 正面/背面)
+ALTER TABLE cards ADD COLUMN card_type VARCHAR(20) DEFAULT 'qa'; -- qa: 问答, note: 笔记, code: 代码
