@@ -13,6 +13,11 @@ pub struct CardSearchQuery {
     pub category_id: Option<i32>,
 }
 
+#[derive(Deserialize, Debug)]
+pub struct SubjectQuery {
+    pub subject_id: i32,
+}
+
 #[instrument(skip(state))]
 pub async fn create_card(
     State(state): State<AppState>,
@@ -74,4 +79,14 @@ pub async fn review_card(
     CardRepository::update_review(&state.db, id, payload.interval_days).await?;
     info!("📅 卡片 {} 复习进度已更新", id);
     Ok(StatusCode::OK)
+}
+
+#[instrument(skip(state))]
+pub async fn list_cards_by_subject(
+    State(state): State<AppState>,
+    Query(params): Query<SubjectQuery>,
+) -> Result<Json<Vec<Card>>, AppError> {
+    info!("🚀 开始加载科目 {} 的复习卡片", params.subject_id);
+    let cards = CardRepository::fetch_by_subject(&state.db, params.subject_id).await?;
+    Ok(Json(cards))
 }

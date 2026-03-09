@@ -6,6 +6,23 @@ use chrono::Utc;
 pub struct CardRepository;
 
 impl CardRepository {
+        // 新增：通过科目ID获取该科目下所有卡片（按复习时间排序）
+    pub async fn fetch_by_subject(pool: &PgPool, subject_id: i32) -> Result<Vec<Card>, AppError> {
+        let sql = "
+            SELECT c.id, c.category_id, c.title, c.essence, c.insights, 
+                   c.difficulty, c.importance, c.interval_days, 
+                   c.next_review_date, c.created_at 
+            FROM cards c
+            JOIN categories cat ON c.category_id = cat.id
+            WHERE cat.subject_id = $1
+            ORDER BY c.next_review_date ASC, c.importance ASC";
+            
+        let cards = sqlx::query_as::<_, Card>(sql)
+            .bind(subject_id)
+            .fetch_all(pool)
+            .await?;
+        Ok(cards)
+    }
     pub async fn fetch_by_category(pool: &PgPool, cat_id: i32) -> Result<Vec<Card>, AppError> {
         let sql = "
             SELECT id, category_id, title, essence, insights, difficulty, importance, interval_days, next_review_date, created_at 
