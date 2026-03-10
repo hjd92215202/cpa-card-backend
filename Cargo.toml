@@ -17,3 +17,8 @@ dotenvy = "0.15"
 
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+jsonwebtoken = "9"
+bcrypt = "0.15"
+
+validator = { version = "0.19", features = ["derive"] }

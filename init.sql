@@ -103,3 +103,21 @@ ALTER TABLE subjects ADD COLUMN visibility VARCHAR(20) DEFAULT 'private'; -- 预
 
 -- 优化卡片表，支持多种卡片类型 (不仅仅是 正面/背面)
 ALTER TABLE cards ADD COLUMN card_type VARCHAR(20) DEFAULT 'qa'; -- qa: 问答, note: 笔记, code: 代码
+
+
+-- 1. 创建用户表
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,           -- 存储加密后的密码
+    email VARCHAR(100),
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. 升级学科表 (关联用户)
+ALTER TABLE subjects ADD COLUMN user_id INTEGER REFERENCES users(id) ON DELETE CASCADE;
+CREATE INDEX idx_subjects_user ON subjects(user_id);
+
+-- 3. 升级卡片表 (直接关联用户，实现快速查询)
+ALTER TABLE cards ADD COLUMN user_id INTEGER REFERENCES users(id) ON DELETE CASCADE;
+CREATE INDEX idx_cards_user ON cards(user_id);
