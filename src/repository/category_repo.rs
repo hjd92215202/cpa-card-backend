@@ -5,15 +5,18 @@ use sqlx::PgPool;
 pub struct CategoryRepository;
 
 impl CategoryRepository {
-    pub async fn is_owner(pool: &sqlx::PgPool, subject_id: i32, user_id: i32) -> bool {
-        let result = sqlx::query!(
-            "SELECT id FROM subjects WHERE id = $1 AND user_id = $2",
-            subject_id,
-            user_id
-        )
-        .fetch_optional(pool)
-        .await;
-        result.is_ok() && result.unwrap().is_some()
+    pub async fn is_owner(pool: &PgPool, subject_id: i32, user_id: i32) -> bool {
+        // 使用 sqlx::query 配合 .bind() 替代 sqlx::query!
+        let result = sqlx::query("SELECT id FROM subjects WHERE id = $1 AND user_id = $2")
+            .bind(subject_id)
+            .bind(user_id)
+            .fetch_optional(pool)
+            .await;
+
+        match result {
+            Ok(Some(_)) => true, // 找到了记录，说明拥有此科目
+            _ => false,          // 没找到或报错，说明不拥有
+        }
     }
     pub async fn find_by_subject(
         pool: &PgPool,
