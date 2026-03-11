@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: polymath-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: gfuJNHUKhjfP
+      POSTGRES_DB: polymath_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  backend:
+    build: ./backend
+    container_name: polymath-backend
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:gfuJNHUKhjfP@db:5432/polymath_db
+      JWT_SECRET: "vvXCVMKYD#^(:?HFCV%&"
+      RUST_LOG: debug
+
+  frontend:
+    build: ./frontend
+    container_name: polymath-frontend
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # 挂载宿主机的证书目录
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

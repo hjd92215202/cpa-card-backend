@@ -74,7 +74,7 @@ async fn main() {
         .with_state(state);
 
     // 7. 启动服务器
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     info!("🚀 CPA Card Backend 已就绪");
     info!("📍 监听地址: http://{}", addr);
 
